@@ -1,0 +1,113 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>
+  <meta charset="utf-8">
+  <title>RAVE MOM</title>
+  <!-- <link rel="icon" type="image/svg+xml" href="/assets/torii.svg"> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+<h1> RAVE MOM </h1>
+
+<main>
+  <p id="currentTrackDisplay"> Album Name - Current Track Name </p>
+  <audio id="audioPlayer" controls>
+    <source id="audioSource" type="audio/mpeg">
+  </audio>
+
+  <button onClick="playPreviousTrack()">prev</button>
+  <button onClick="playNextTrack()">next</button>
+
+  <div id="trackList"> </div>
+</main>
+</body>
+
+<script>
+let currentlyPlaying = 0;
+let playlist;
+
+async function main() {
+  let response = await fetch('/playlist');
+  playlist = await response.json();
+
+  document.getElementById('trackList').innerHTML = playlist
+    .map((track, index) => trackElement(track, index))
+    .join('');
+
+  if (playlist.length > 0) {
+    playSong(0);
+  }
+}
+main();
+
+function trackElement(track, index) {
+  return `
+    <div class="track" onClick={playSong(${index})}>
+      <button onClick="deleteTrack('${track.uuid}', event)">X</button>
+      <button onClick="vote('${track.uuid}', 'up', event)">+</button>
+      <button onClick="vote('${track.uuid}', 'down', event)">-</button>
+      <div>
+        <p> ${track.filename}</p>
+        <p class="albumTitle"> ${track.album} : ${track.upvotes} upvotes | ${track.times_listened} listens</p>
+      </div>
+    </div>
+  `;
+}
+
+function playSong(trackIndex) {
+  const track = playlist[trackIndex];
+
+  audioSource.src = `/track/${encodeURIComponent(track.album)}/${encodeURIComponent(track.filename)}`;  audioPlayer.load();
+  audioPlayer.play();
+
+  const trackElements = document.querySelectorAll('.track');
+  trackElements.forEach(track => track.classList.remove('currently-playing'));
+  trackElements[trackIndex].classList.add('currently-playing');
+
+  document.getElementById('currentTrackDisplay').innerHTML = `${track.album} - ${track.filename}`;
+
+  currentlyPlaying = trackIndex;
+}
+
+function vote(uuid, direction) {
+  fetch('/vote', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uuid, direction })
+  });
+}
+
+function deleteTrack(uuid, event) {
+  fetch('/deleteTrack', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uuid })
+  });
+}
+
+audioPlayer.addEventListener('ended', () => {
+  fetch('/listened', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uuid: playlist[currentlyPlaying].uuid })
+  });
+  playNextTrack();
+});
+
+function playNextTrack() {
+  if (currentlyPlaying < playlist.length - 1 ) {
+    playSong(currentlyPlaying + 1);
+  } 
+}
+
+function playPreviousTrack() {
+  if (0 < currentlyPlaying) {
+    playSong(currentlyPlaying - 1);
+  }
+}
+</script>
+
+</html>

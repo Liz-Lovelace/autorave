@@ -1,0 +1,7 @@
+source "https://rubygems.org" 
+gem "sinatra"
+gem "ruby-handlebars"
+gem "webrick"
+gem "sqlite3"
+gem "securerandom"
+gem "taglib-ruby"

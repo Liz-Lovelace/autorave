@@ -1,0 +1,47 @@
+GIT
+  remote: https://github.com/mhui/youtube-dl.rb
+  revision: 798efcd7e426acb7e327cc4e6207c9ce13fd1183
+  specs:
+    youtube-dl.rb (2023.04.03.1)
+      terrapin (>= 0.6.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    climate_control (1.2.0)
+    mustermann (3.0.0)
+      ruby2_keywords (~> 0.0.1)
+    parslet (1.8.2)
+    rack (2.2.8)
+    rack-protection (3.1.0)
+      rack (~> 2.2, >= 2.2.4)
+    ruby-handlebars (0.4.1)
+      parslet (~> 1.6, >= 1.6.2)
+    ruby2_keywords (0.0.5)
+    securerandom (0.3.0)
+    sinatra (3.1.0)
+      mustermann (~> 3.0)
+      rack (~> 2.2, >= 2.2.4)
+      rack-protection (= 3.1.0)
+      tilt (~> 2.0)
+    sqlite3 (1.6.8-x86_64-linux)
+    taglib-ruby (1.1.3)
+    terrapin (1.0.1)
+      climate_control
+    tilt (2.3.0)
+    webrick (1.8.1)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  ruby-handlebars
+  securerandom
+  sinatra
+  sqlite3
+  taglib-ruby
+  webrick
+  youtube-dl.rb!
+
+BUNDLED WITH
+   2.4.22

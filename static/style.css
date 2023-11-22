@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@200;400;600&display=swap');
+
+:root {
+  --black: #0e0c0b;
+  --grey: #999;
+  --red: #ff0000;
+  --green: #8bec55;
+  --yellow: #ff9c00;
+  --blue: #00a2ff;
+  --magenta: #ff00ce;
+  --cyan: #0bf8ee;
+  --white: #ffffff;
+}
+
+body {
+  background-color: var(--blue);
+  color: var(--black);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: var(--white);
+  text-shadow: var(--black) -3px 3px;
+  font-size: 72px;
+  margin-top: 10px;
+}
+
+main {
+  max-width: 60em;
+  margin: auto;
+}
+
+#audioPlayer {
+  width: 30em;
+  display: block;
+}
+
+#trackList {
+  background-color: var(--white);
+  padding: 30px 40px;
+}
+
+.track{
+  padding: 10px 0;
+  transition: padding 0.35s ease-in;
+  display: flex;
+}
+
+.track:hover {
+  padding-left: 40px;
+  transition: padding 0.15s ease-out;
+}
+
+.track p {
+  margin: 0;
+}
+
+.track .albumTitle {
+  font-size: 0.8em;
+}
+
+.currently-playing {
+  font-weight: bold;
+}
+
