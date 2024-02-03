@@ -3,6 +3,17 @@ require "ruby-handlebars"
 def setupHandlebars
   hbs = Handlebars::Handlebars.new
 
+  hbs.register_helper('isZero') do |context, value, block, else_block|
+    if value == 0
+      block.fn(context)
+    elsif else_block
+      else_block.fn(context)
+    else
+      ''
+    end
+  end
+
+
   templates_directory = File.join(File.dirname(__FILE__), '../templates/')
   compiled_templates = {}
 

@@ -13,11 +13,23 @@
 }
 
 body {
-  background-color: var(--blue);
-  color: var(--black);
+  background-color: var(--black);
+  color: var(--white);
   font-family: 'Noto Sans JP', sans-serif;
   font-weight: 400;
   font-size: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+#lasers {
+  background-image: url("bg_eb.png");
+  background-size: cover;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: -1005;
+  image-rendering: crisp-edges;
 }
 
 h1 {
@@ -25,7 +37,7 @@ h1 {
   color: var(--white);
   text-shadow: var(--black) -3px 3px;
   font-size: 72px;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 main {
@@ -33,13 +45,22 @@ main {
   margin: auto;
 }
 
+.controls-container {
+  display: flex;
+}
+
 #audioPlayer {
-  width: 30em;
+  width: 10em;
   display: block;
 }
 
+#ratingControls div {
+  display: flex;
+  font-size: 72px;
+}
+
 #trackList {
-  background-color: var(--white);
+  background-color: var(--black);
   padding: 30px 40px;
 }
 

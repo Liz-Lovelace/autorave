@@ -5,6 +5,7 @@ require_relative 'setup_handlebars'
 require_relative 'dj'
 
 db = Database.new
+# todo: do this on every pageload... or something like that
 db.scan_tracks
 
 templates = setupHandlebars
@@ -16,6 +17,19 @@ end
 get '/playlist' do
   content_type :json
   DJ.playlist(db.get_all_tracks, 20).to_json
+end
+
+get '/rating_controls' do
+  track = db.get_track(request.params["uuid"])
+  action = request.params["action"]
+  if action == "delete"
+    track["upvotes"] = 666
+  elsif action == "upvote"
+    track["upvotes"] += 1
+  elsif action == "downvote"
+    track["upvotes"] -= 1
+  end
+  templates['rating_controls'].call(track)
 end
 
 get '/track/:album/:file' do |album, file|
@@ -33,6 +47,7 @@ post '/vote' do
   data = JSON.parse(request.body.read)
   uuid = data['uuid']
   direction = data['direction']
+  # todo: upvotes shouldnt go below 0
   if direction == 'up'
     db.update_track_dangerous(uuid, { upvotes: 'upvotes + 1' })
   elsif direction == 'down'

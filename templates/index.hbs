@@ -3,23 +3,33 @@
 <head>
   <meta charset="utf-8">
   <title>RAVE MOM</title>
-  <!-- <link rel="icon" type="image/svg+xml" href="/assets/torii.svg"> -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 
 <body>
-<h1> RAVE MOM </h1>
+
+<div id="lasers"></div>
 
 <main>
-  <p id="currentTrackDisplay"> Album Name - Current Track Name </p>
-  <audio id="audioPlayer" controls>
-    <source id="audioSource" type="audio/mpeg">
-  </audio>
+  <h1> RAVE MOM </h1>
+  <div class="controls-container">
 
-  <button onClick="playPreviousTrack()">prev</button>
-  <button onClick="playNextTrack()">next</button>
+    <div> 
+      <audio id="audioPlayer" controls>
+        <source id="audioSource" type="audio/mpeg">
+      </audio>
+      <button onClick="playPreviousTrack()">prev</button>
+      <button onClick="playNextTrack()">next</button>
+    </div>
+
+    <div>
+      <p id="currentTrackDisplay"> Album Name - Current Track Name </p>
+      <div id="ratingControls" hx-get="/rating_controls" hx-trigger="DOMSubtreeModified from:#audioSource" hx-vals='js:{uuid: playlist[currentlyPlaying].uuid}'> </div>
+    </div>
+
+  </div>
 
   <div id="trackList"> </div>
 </main>
@@ -46,9 +56,6 @@ main();
 function trackElement(track, index) {
   return `
     <div class="track" onClick={playSong(${index})}>
-      <button onClick="deleteTrack('${track.uuid}', event)">X</button>
-      <button onClick="vote('${track.uuid}', 'up', event)">+</button>
-      <button onClick="vote('${track.uuid}', 'down', event)">-</button>
       <div>
         <p> ${track.filename}</p>
         <p class="albumTitle"> ${track.album} : ${track.upvotes} upvotes | ${track.times_listened} listens</p>
@@ -58,9 +65,11 @@ function trackElement(track, index) {
 }
 
 function playSong(trackIndex) {
+  currentlyPlaying = trackIndex;
   const track = playlist[trackIndex];
 
-  audioSource.src = `/track/${encodeURIComponent(track.album)}/${encodeURIComponent(track.filename)}`;  audioPlayer.load();
+  audioSource.src = `/track/${encodeURIComponent(track.album)}/${encodeURIComponent(track.filename)}`;
+  audioPlayer.load();
   audioPlayer.play();
 
   const trackElements = document.querySelectorAll('.track');
@@ -68,8 +77,18 @@ function playSong(trackIndex) {
   trackElements[trackIndex].classList.add('currently-playing');
 
   document.getElementById('currentTrackDisplay').innerHTML = `${track.album} - ${track.filename}`;
+}
 
-  currentlyPlaying = trackIndex;
+function voteCurrentTrack(direction) {
+  if (playlist[currentlyPlaying]) {
+    vote(playlist[currentlyPlaying].uuid, direction);
+  }
+}
+
+function deleteCurrentTrack() {
+  if (playlist[currentlyPlaying]) {
+    deleteTrack(playlist[currentlyPlaying].uuid);
+  }
 }
 
 function vote(uuid, direction) {
@@ -80,7 +99,7 @@ function vote(uuid, direction) {
   });
 }
 
-function deleteTrack(uuid, event) {
+function deleteTrack(uuid) {
   fetch('/deleteTrack', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -111,3 +130,4 @@ function playPreviousTrack() {
 </script>
 
 </html>
+
