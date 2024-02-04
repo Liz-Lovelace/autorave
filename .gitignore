@@ -1,2 +1,5 @@
 database.db
 music/
+yarn.lock
+node_modules/
+

@@ -1,19 +1,8 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>
-  <meta charset="utf-8">
-  <title>RAVE MOM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/static/style.css" />
-</head>
-
-<body>
-
 <div id="lasers"></div>
 
 <main>
   <h1> RAVE MOM </h1>
+  <a href="/tracks"> ADD NEW TRAX </a>
   <div class="controls-container">
 
     <div> 
@@ -33,23 +22,19 @@
 
   <div id="trackList"> </div>
 </main>
-</body>
 
 <script>
 let currentlyPlaying = 0;
 let playlist;
 
 async function main() {
-  let response = await fetch('/playlist');
-  playlist = await response.json();
+  let playlist = await fetch('/playlist').then(res => res.json());
+
+  console.log(playlist)
 
   document.getElementById('trackList').innerHTML = playlist
     .map((track, index) => trackElement(track, index))
     .join('');
-
-  if (playlist.length > 0) {
-    playSong(0);
-  }
 }
 main();
 
@@ -128,6 +113,3 @@ function playPreviousTrack() {
   }
 }
 </script>
-
-</html>
-

@@ -16,7 +16,7 @@ end
 
 get '/playlist' do
   content_type :json
-  DJ.playlist(db.get_all_tracks, 20).to_json
+  DJ.playlist(db.get_all_tracks).to_json
 end
 
 get '/rating_controls' do
