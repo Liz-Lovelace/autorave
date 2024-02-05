@@ -1,0 +1,10 @@
+<div hx-target="#ratingControls">
+  {{#isZero upvotes}}
+    <button class="del-btn" hx-get="/rating-controls" hx-vals='{"action": "delete"}'>🗑</button>
+  {{else}}
+    <button class="down-btn" hx-get="/rating-controls" hx-vals='{"action": "downvote"}'>◀</button>
+  {{/isZero}}
+  <span> {{upvotes}} </span>
+  <button class="up-btn" hx-get="/rating-controls" hx-vals='{"action": "upvote"}'>▶</button>
+</div>
+

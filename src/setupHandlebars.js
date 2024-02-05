@@ -17,5 +17,15 @@ export default async function SetupHandlebars() {
     }
   }
 
+  Handlebars.registerHelper('isZero', function(value, options) {
+    if (value === 0) {
+      return options.fn(this);
+    }
+    else if (options.inverse) {
+      return options.inverse(this);
+    }
+    return '';
+  });
+
   return templates;
 }

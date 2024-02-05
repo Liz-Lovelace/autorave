@@ -3,7 +3,7 @@ import { getPath } from './utils.js';
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: getPath('/database.db'),
+  storage: getPath('./music/database.db'),
   logging: false,
 });
 
@@ -57,6 +57,10 @@ export const Track = sequelize.define('Track', {
 // await sequelize.sync({alter: true}); // uncomment to migrate!
 
 export async function isDuplicate(track) {
-  return Track.findOne({ where: { track_url: track.track_url } });
+  return Boolean(await Track.findOne({ where: { track_url: track.track_url } }));
+}
+
+export async function isInProgress() {
+  return Boolean(await Track.findOne({ where: { download_status: 'in progress' } }));
 }
 

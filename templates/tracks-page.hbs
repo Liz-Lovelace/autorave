@@ -1,5 +1,12 @@
 <a href="/">back</a>
 
+<form hx-post="/download-tracks" hx-target="#download-response" hx-swap="innerHTML">
+  <input type="text" name="url" placeholder="Enter track URL here">
+  <button type="submit">Add to Queue</button>
+</form>
+<div id="download-response"></div>
+
+
 <div class="queue-container" hx-get="/track-queue" hx-trigger="load, every 2s" hx-swap="innerHTML">
   <!-- Content fetched from /track-queue will be loaded here -->
 </div>

@@ -1,57 +1,34 @@
-import { Track } from './database.js'
-import YTDLP from 'yt-dlp-wrap'
-import { getPath } from './utils.js'
+import { Track } from './database.js';
+import YTDLP from 'yt-dlp-wrap';
+import { getPath } from './utils.js';
 import uuidGenerator from 'short-uuid';
+import { isDuplicate, isInProgress } from './database.js';
 
-import { isDuplicate } from './database.js';
-
-const YTDlpWrap = YTDLP.default
-const YTDlpPath = getPath('./yt-dlp')
+const YTDlpWrap = YTDLP.default;
+const YTDlpPath = getPath('./yt-dlp');
 /*
 // UNCOMMENT THIS TO DOWNLOAD THE LATEST YT-DLP BINARY
-
 // todo: this should really like, conditionally download it only if it's not already in the path
 let githubReleasesData = await YTDlpWrap.getGithubReleases(1, 5);
-
 await YTDlpWrap.downloadFromGithub(
     YTDlpPath
 );
 */
 const downloader = new YTDlpWrap(YTDlpPath);
 
-// downloadTracks('https://patriciataxxon.bandcamp.com/album/agnes-hilda')
-// addToDownloadQueue('https://toyoyonoine.bandcamp.com/album/negi-assort')
-downloadTracks();
-// downloadTracks('https://toyoyonoine.bandcamp.com/track/ff-nnddeerr-2')
-// addToDownloadQueue('https://www.youtube.com/watch?v=c4KNd0Yv6d0&pp=ygULcGVuaXMgbXVzaWM%3D')
-
-export async function addToDownloadQueue(url) {
-  let tracks = await fetchTracksMetadata(url);
-  for (let track of tracks) {
-    if (await isDuplicate(track)) {
-      console.log(`track already exists, skipping ${track.title}`);
-      continue;
-    }
-    await track.save()
-    console.log(`added track to queue: ${track.title}`);
-  }
-}
-
-async function fetchTracksMetadata(url) {
-  let metadata = await downloader.getVideoInfo(url);
-  console.log('\ndownloaded metadata')
-
-  metadata = Array.isArray(metadata) ? metadata : [metadata]
-
-  return metadata.map(metadataToTrack)
-}
-
 export async function downloadTracks() {
+  if (await isInProgress()) {
+    console.log('download not started: another download is already in progress');
+    return;
+  }
+
   let tracks = await Track.findAll({
-    where: { download_status: 'awaiting download' }
+    where: { download_status: 'awaiting download' },
   });
+
   for (let track of tracks) {
     await track.update({ download_status: 'in progress' });
+    // todo: if this freezes we're fucked
     await downloadTrack(getPath(`./music/${track.uuid}.${track.ext}`), track.track_url);
     // todo: try-catch and set to `error`
     await track.update({ download_status: 'downloaded' });
@@ -70,6 +47,25 @@ async function downloadTrack(outputPath, trackURL) {
   ]);
 }
 
+export async function addToDownloadQueue(url) {
+  let tracks = await fetchTracksMetadata(url);
+  for (let track of tracks) {
+    if (await isDuplicate(track)) {
+      console.log(`track already exists, skipping ${track.title}`);
+      continue;
+    }
+    await track.save();
+    console.log(`added track to queue: ${track.title}`);
+  }
+}
+
+async function fetchTracksMetadata(url) {
+  let metadata = await downloader.getVideoInfo(url);
+  console.log('\ndownloaded metadata');
+  metadata = Array.isArray(metadata) ? metadata : [metadata];
+  return metadata.map(metadataToTrack);
+}
+
 function metadataToTrack(md) {
   return Track.build({
     uuid: uuidGenerator.generate(),
@@ -81,14 +77,15 @@ function metadataToTrack(md) {
     extractor: md.extractor || 'unknown extractor',
     track_url: assertProperty(md, 'original_url'),
     image_url: md.thumbnail || null,
-    download_status: "awaiting download",
+    download_status: 'awaiting download',
   });
 }
 
 function assertProperty(metadata, property) {
   if (metadata[property] !== undefined) {
-    return metadata[property]
-  } else {
-    throw new Error(`track property "${property} is undefined! (${metadata.title} ${metadata.original_url})`)
+    return metadata[property];
+  }
+  else {
+    throw new Error(`track property "${property} is undefined! (${metadata.title} ${metadata.original_url})`);
   }
 }

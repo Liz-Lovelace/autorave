@@ -1,0 +1,109 @@
+<div id="lasers"></div>
+<div class="mikubox">
+  <img src="/static/miku1.gif" />
+  <img src="/static/miku2.gif" />
+  <img src="/static/miku3.gif" />
+  <img src="/static/miku4.gif" />
+  <img src="/static/miku5.gif" />
+</div>
+
+<p id="currentTrackDisplay">  </p>
+
+<main>
+  <div
+    id="ratingControls"
+    hx-get="/rating-controls"
+    hx-trigger="DOMSubtreeModified from:#audioSource, DOMSubtreeModified from:#trackList"
+    hx-vals='js:{uuid: playlist[currentlyPlaying].uuid}'
+  > </div>
+
+  <audio id="audioPlayer" controls>
+    <source id="audioSource" type="audio/mpeg">
+  </audio>
+
+  <div id="trackList"> </div>
+
+  <a href="/tracks"> ADD NEW TRAX </a>
+</main>
+
+<script>
+let currentlyPlaying = 0;
+let playlist;
+const trackListElem = document.getElementById('trackList')
+
+main();
+async function main() {
+  playlist = await fetch('/playlist').then(res => res.json());
+
+  await addAnotherTrack();
+  playSong(0)
+}
+
+function addAnotherTrack() {
+  let index = trackListElem.children.length
+
+  if (index >= playlist.length) {
+    alert("you ran out of songs lol")
+    return;
+  }
+
+  let trackHTML = trackElement(playlist[index], index);
+  trackListElem.innerHTML = trackHTML + trackListElem.innerHTML;
+}
+
+function deleteCurrentTrack() {
+  console.log('deleting')
+  trackListElem.children[trackListElem.children.length - 1 - currentlyPlaying].style="display: none;"
+  playNextTrack();
+}
+
+function playSong(trackIndex) {
+  currentlyPlaying = trackIndex;
+  const track = playlist[trackIndex];
+
+  audioSource.src = `/track/${encodeURIComponent(track.uuid)}.${encodeURIComponent(track.ext)}`;
+  audioPlayer.load();
+  audioPlayer.play();
+
+  const trackElements = document.querySelectorAll('.track');
+  trackElements.forEach(track => track.classList.remove('currently-playing'));
+  trackElements[trackListElem.children.length - 1 -trackIndex].classList.add('currently-playing');
+
+  document.getElementById('currentTrackDisplay').innerHTML = track.title;
+
+  if(currentlyPlaying == trackListElem.children.length - 1) {
+    addAnotherTrack();
+  }
+}
+
+function trackElement(track, index) {
+  return `
+    <div class="track" onClick={playSong(${index})}>
+      <p> ${track.title}</p>
+      <p class="albumTitle"> ${track.album || ''} </p>
+    </div>
+  `;
+}
+
+audioPlayer.addEventListener('ended', () => {
+  fetch('/listened', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uuid: playlist[currentlyPlaying].uuid })
+  });
+
+  playNextTrack();
+});
+
+function playNextTrack() {
+  if (currentlyPlaying < playlist.length - 1 ) {
+    playSong(currentlyPlaying + 1);
+  } 
+}
+
+function playPreviousTrack() {
+  if (0 < currentlyPlaying) {
+    playSong(currentlyPlaying - 1);
+  }
+}
+</script>

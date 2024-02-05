@@ -1,0 +1,6 @@
+<div hx-target="#ratingControls">
+    <button hx-get="/rating-controls" hx-vals='{"uuid": "{{uuid}}"}'>no</button>
+    <span> delete? </span>
+    <button class="del-btn" hx-delete="/track" hx-vals='{"uuid": "{{uuid}}"}' onclick="deleteCurrentTrack()">🗑</button>
+</div>
+

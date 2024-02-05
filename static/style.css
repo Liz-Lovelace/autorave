@@ -29,45 +29,87 @@ body {
   height: 100vh;
   position: fixed;
   z-index: -1005;
-  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
 
-h1 {
-  text-align: center;
-  color: var(--white);
-  text-shadow: var(--black) -3px 3px;
-  font-size: 72px;
-  margin-top: 0;
+.mikubox {
+  display: flex;
+  justify-content: center;
+}
+
+.mikubox img {
+  height: 15vw;
+  object-fit: cover;
+  margin: 0 -2vw;
 }
 
 main {
-  max-width: 60em;
+  max-width: min(60em, 95vw);
   margin: auto;
 }
 
-.controls-container {
-  display: flex;
+#currentTrackDisplay {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
 }
 
 #audioPlayer {
-  width: 10em;
+  width: 100%;
   display: block;
+  border-radius: 0;
+  background-color: #000;
 }
 
 #ratingControls div {
   display: flex;
-  font-size: 72px;
+  justify-content: center;
+  font-size: 40px;
+  margin: 20px 0 10px;
+}
+
+#ratingControls span {
+  min-width: 60px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#ratingControls button {
+  width: 60px;
+  height: 60px;
+  font-size: 30px;
+}
+
+.del-btn {
+  border: 3px dashed #700;
+  background-color: #e20e53;;
+  color: #fff;
+  padding-top: 6px;
+}
+
+.down-btn {
+  border: 3px dashed #930a0a;
+  background-color: #ff0060;;
+  color: #fff;
+  padding-bottom: 10px;
+}
+
+.up-btn {
+  border: 4px outset #0093ff;
+  background-color: #20fa61;
+  color: #1699e8;
+  padding-bottom: 10px;
 }
 
 #trackList {
   background-color: var(--black);
-  padding: 30px 40px;
+  padding: 20px 20px;
 }
 
 .track{
   padding: 10px 0;
   transition: padding 0.35s ease-in;
-  display: flex;
 }
 
 .track:hover {
@@ -85,5 +127,9 @@ main {
 
 .currently-playing {
   font-weight: bold;
+  background-color: #fff1;
+  padding-left: 40px;
+  transition: padding 0.15s ease-out;
+  border: 1px solid magenta;
 }
 

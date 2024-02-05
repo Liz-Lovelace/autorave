@@ -2,6 +2,7 @@ export class DJ {
   static playlist(tracks) {
     tracks.forEach(track => {
       track.weight = this.determineWeight(track);
+      track.dataValues.weight = track.weight;
     });
     const filteredTracks = tracks.filter(track => track.weight !== 0);
     return this.mixTracks(filteredTracks);
@@ -16,20 +17,20 @@ export class DJ {
   }
 
   static determineWeight(track) {
-    let factors = [];
+    let weight = 1;
 
-    // todo: check that this is seconds
     if (track.length >= 480) {
-      factors.push(480.0 / track.length);
+      weight *= (480.0 / track.length);
     }
 
     if (track.upvotes > 0) {
-      factors.push(track.upvotes);
-    } else {
-      factors.push(Math.pow(0.8, track.times_listened));
+      weight *= track.upvotes;
+    }
+    else {
+      weight *= Math.pow(0.8, track.times_listened);
     }
 
-    return factors.reduce((acc, val) => acc * val, 1);
+    return weight;
   }
 }
 
